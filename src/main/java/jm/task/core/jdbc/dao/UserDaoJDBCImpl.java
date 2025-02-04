@@ -15,6 +15,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
+    @Override
     public void createUsersTable() {
         String createString =
                 "CREATE TABLE Users " + "(id integer NOT NULL AUTO_INCREMENT, " +
@@ -22,27 +23,43 @@ public class UserDaoJDBCImpl implements UserDao {
                         "age integer, " + "PRIMARY KEY (id))";
 
         try {
-            try (Statement stmt = conn.createStatement()) {
-                stmt.executeUpdate(createString);
-            }
-        } catch (SQLException ignore) {
-        } catch (RuntimeException e) {
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(createString);
+
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
+    @Override
     public void dropUsersTable() {
 
         String dropString = "DROP TABLE Users";
 
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(dropString);
-        } catch (SQLException ignore) {
-        } catch (RuntimeException e) {
+        try (Statement statement = conn.createStatement()) {
+            statement.executeUpdate(dropString);
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
+    @Override
     public void saveUser(String name, String lastName, byte age) {
         String insertString = "INSERT INTO Users (name, lastName, age) VALUES (?, ?, " +
                 "?)";
@@ -52,24 +69,40 @@ public class UserDaoJDBCImpl implements UserDao {
             insertStmt.setString(2, lastName);
             insertStmt.setInt(3, age);
             insertStmt.executeUpdate();
-        } catch (SQLException ignore) {
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
+    @Override
     public void removeUserById(long id) {
         String sql = "DELETE FROM Users WHERE id = ?";
 
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
-        } catch (SQLException ignore) {
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
+    @Override
     public List<User> getAllUsers() {
 
         String selectString = "SELECT * FROM Users";
@@ -84,23 +117,38 @@ public class UserDaoJDBCImpl implements UserDao {
                 byte age = (byte) rs.getInt(4);
                 users.add(new User(id, name, lastName, age));
             }
-        } catch (SQLException ignore) {
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return users;
     }
 
+    @Override
     public void cleanUsersTable() {
         String deleteString = "DELETE FROM Users";
 
         try {
             Statement statement = conn.createStatement();
             statement.executeUpdate(deleteString);
-        } catch (SQLException ignore) {
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
