@@ -8,76 +8,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private static final Connection conn = Util.getConnection();
-
     public UserDaoJDBCImpl() {
 
     }
 
     @Override
     public void createUsersTable() {
-        String createString =
+        String sql =
                 "CREATE TABLE Users " + "(id integer NOT NULL AUTO_INCREMENT, " +
                         "name varchar(255) NOT NULL, " + "lastName varchar(255), " +
                         "age integer, " + "PRIMARY KEY (id))";
 
-        try {
+        try (Connection conn = Util.getConnection()) {
             Statement statement = conn.createStatement();
-            statement.executeUpdate(createString);
+            statement.executeUpdate(sql);
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     @Override
     public void dropUsersTable() {
+        String sql = "DROP TABLE Users";
 
-        String dropString = "DROP TABLE Users";
-
-        try (Statement statement = conn.createStatement()) {
-            statement.executeUpdate(dropString);
-        } catch (Exception e) {
+        try (Connection conn = Util.getConnection()) {
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String insertString = "INSERT INTO Users (name, lastName, age) VALUES (?, ?, " +
+        String sql = "INSERT INTO Users (name, lastName, age) VALUES (?, ?, " +
                 "?)";
 
-        try (PreparedStatement insertStmt = conn.prepareStatement(insertString)) {
+        try (Connection conn = Util.getConnection()) {
+            PreparedStatement insertStmt = conn.prepareStatement(sql);
             insertStmt.setString(1, name);
             insertStmt.setString(2, lastName);
             insertStmt.setInt(3, age);
             insertStmt.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
@@ -85,19 +60,12 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
         String sql = "DELETE FROM Users WHERE id = ?";
 
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+        try (Connection conn = Util.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(sql);
             statement.setLong(1, id);
             statement.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
@@ -106,7 +74,7 @@ public class UserDaoJDBCImpl implements UserDao {
         final List<User> users = new ArrayList<>();
         String selectString = "SELECT * FROM Users";
 
-        try {
+        try (Connection conn = Util.getConnection()) {
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(selectString);
             while (rs.next()) {
@@ -116,16 +84,8 @@ public class UserDaoJDBCImpl implements UserDao {
                 byte age = (byte) rs.getInt(4);
                 users.add(new User(id, name, lastName, age));
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         return users;
@@ -135,19 +95,11 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         String deleteString = "DELETE FROM Users";
 
-        try {
+        try (Connection conn = Util.getConnection()) {
             Statement statement = conn.createStatement();
             statement.executeUpdate(deleteString);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
