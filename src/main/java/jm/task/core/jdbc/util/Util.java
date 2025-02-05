@@ -1,28 +1,26 @@
 package jm.task.core.jdbc.util;
 
 import java.sql.*;
-import java.util.Properties;
 
 public class Util {
+    private final static String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    private final static String DB_URL = "jdbc:mysql://192.168.0.15:3306/test1";
+    private final static String DB_USER = "kata";
+    private final static String DB_PASSWORD = "kata";
 
     public static Connection getConnection() {
-        String driver = "com.mysql.cj.jdbc.Driver";
-        String url = "jdbc:mysql://192.168.0.15:3306/test1";
-        Properties props = new Properties();
-        props.setProperty("user", "kata");
-        props.setProperty("password", "kata");
 
         try {
-            Class.forName(driver);
-            try {
-                return DriverManager.getConnection(url, props);
-            } catch (SQLException e) {
-                System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-                return null;
-            }
+            Class.forName(JDBC_DRIVER);
         } catch (ClassNotFoundException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
-        return null;
+
+        try {
+            return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        } catch (SQLException e) {
+            System.err.format("Connection State: %s\n%s", e.getSQLState(), e.getMessage());
+            return null;
+        }
     }
 }
