@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final List<User> users = new ArrayList<>();
     private static final Connection conn = Util.getConnection();
 
     public UserDaoJDBCImpl() {
@@ -104,7 +103,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-
+        final List<User> users = new ArrayList<>();
         String selectString = "SELECT * FROM Users";
 
         try {
