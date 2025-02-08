@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class Util {
     private final static String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private final static String DB_URL = "jdbc:mysql://192.168.0.15:3306/test1";
+    private final static String DB_URL = "jdbc:mysql://localhost:3306/kata";
     private final static String DB_USER = "kata";
     private final static String DB_PASSWORD = "kata";
     private static SessionFactory sessionFactory;

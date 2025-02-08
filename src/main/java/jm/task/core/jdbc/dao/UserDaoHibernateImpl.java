@@ -11,59 +11,96 @@ public class UserDaoHibernateImpl implements UserDao {
 
     }
 
-
     @Override
     public void createUsersTable() {
         String sql =
-                "CREATE TABLE Users " + "(id integer NOT NULL AUTO_INCREMENT, " +
+                "CREATE TABLE IF NOT EXISTS Users " + "(id integer NOT NULL AUTO_INCREMENT, " +
                         "name varchar(255) NOT NULL, " + "lastName varchar(255), " +
                         "age integer, " + "PRIMARY KEY (id))";
 
-        try (Session session = Util.getSession()) {
+        Session session = null;
+        try {
+            session = Util.getSession();
             session.beginTransaction();
             session.createSQLQuery(sql).executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             System.out.println(e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
     @Override
     public void dropUsersTable() {
-            try (Session session = Util.getSession()) {
-                session.beginTransaction();
-                session.createNativeQuery("DROP TABLE Users").executeUpdate();
-                session.getTransaction().commit();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+        Session session = null;
+        try {
+            session = Util.getSession();
+            session.beginTransaction();
+            session.createNativeQuery("DROP TABLE IF EXISTS Users").executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
             }
-
+            System.out.println(e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        try (Session session = Util.getSession()) {
+
+        Session session = null;
+        try {
+            session = Util.getSession();
             session.beginTransaction();
             session.save(new User(name,lastName,age));
             session.getTransaction().commit();
         } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             System.out.println(e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        try (Session session = Util.getSession()) {
+
+        Session session = null;
+        try {
+            session = Util.getSession();
             session.beginTransaction();
             session.createQuery("delete from User where id = " + id).executeUpdate();
         } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             System.out.println(e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
     @Override
     public List<User> getAllUsers() {
-        try (Session session = Util.getSession()) {
+
+        try (Session session = Util.getSession()){
             session.beginTransaction();
             return session.createQuery("from User", User.class).getResultList();
         } catch (Exception e) {
@@ -74,12 +111,22 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        try (Session session = Util.getSession()) {
+
+        Session session = null;
+        try {
+            session = Util.getSession();
             session.beginTransaction();
             session.createQuery("delete from User").executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             System.out.println(e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 }
